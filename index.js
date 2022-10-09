@@ -53,8 +53,8 @@ const send = (messageData, ignore) => {
 settings = JSON.parse(fs.readFileSync('./settings.json'));
 block = JSON.parse(fs.readFileSync('./block.json'));
 const set = () => {
-  fs.writeFile('./settings.json', JSON.stringify(settings, null, '  '), () => {});
-  fs.writeFile('./block.json', JSON.stringify(block, null, '  '), () => {});
+  fs.writeFile('./settings.json', JSON.stringify(settings, null, '  '), () => { });
+  fs.writeFile('./block.json', JSON.stringify(block, null, '  '), () => { });
 }
 
 let guilds = 0
@@ -89,17 +89,18 @@ client.on('ready', () => {
         description: 'server or user id',
         required: true
       }]
-    }]}]).then(async () => {
-      console.log('Ready!');
-      guilds = (await client.guilds.fetch()).size
-      client.user.setPresence({
-        status: 'idle',
-        activities: [{
-          name: `Joined ${guilds} servers | ping: ${client.ws.ping}ms | ${settings.length} servers globally`,
-          type: 'PLAYING'
-        }]
-      });
-    }).catch(console.error);
+    }]
+  }]).then(async () => {
+    console.log('Ready!');
+    guilds = (await client.guilds.fetch()).size
+    client.user.setPresence({
+      status: 'idle',
+      activities: [{
+        name: `Joined ${guilds} servers | ping: ${client.ws.ping}ms | ${settings.length} servers globally`,
+        type: 'PLAYING'
+      }]
+    });
+  }).catch(console.error);
 });
 
 client.on('guildCreate', (guild) => {
@@ -118,7 +119,7 @@ client.on('guildDelete', (guild) => {
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return
   await interaction.deferReply({ ephemeral: true }).catch(console.error);
-  if (interaction.options.getSubcommand() === 'connect' ) {
+  if (interaction.options.getSubcommand() === 'connect') {
     if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) return interaction.followUp({ embeds: [err('You do not have MANAGE_GUILD privilege to execute this command')] });
     if (settings.every((setting) => setting.guildId !== interaction.guild.id)) {
       interaction.options.getChannel('channel').createWebhook('global').then((webhook) => {
@@ -157,7 +158,7 @@ client.on('interactionCreate', async (interaction) => {
     } else {
       const guild = settings.find((setting) => setting.guildId === interaction.guild.id);
       client.fetchWebhook(guild.webhook, guild.token).then(() => {
-        interaction.followUp({ embeds: [err('Already connected to global chat')]});
+        interaction.followUp({ embeds: [err('Already connected to global chat')] });
       }).catch((errd) => {
         console.error(errd);
         interaction.options.getChannel('channel').createWebhook('global').then((webhook) => {
@@ -234,14 +235,14 @@ client.on('messageCreate', async (message) => {
   if (cooldown.includes(message.author.id)) return message.react('❌').catch(console.error);
   if (message.content >= 4096) return message.react('❌').catch(console.error);
   let embeds = [new MessageEmbed({
-      description: message.content.replace(/\w{23,26}\.\w{6}\.\w{27}/, '<token>'),
-      timestamp: message.createdAt,
-      author: {
-        name: message.author.username,
-        url: `https://discord.com/users/${message.author.id}`,
-        iconURL: message.author.avatarURL()
-      },
-      color: message.author.accentColor
+    description: message.content.replace(/\w{23,26}\.\w{6}\.\w{27}/, '<token>'),
+    timestamp: message.createdAt,
+    author: {
+      name: message.author.username,
+      url: `https://discord.com/users/${message.author.id}`,
+      iconURL: message.author.avatarURL()
+    },
+    color: message.author.accentColor
   })]
   message.stickers.forEach((sticker) => {
     embeds.push(new MessageEmbed({
@@ -322,5 +323,5 @@ client.on('messageCreate', async (message) => {
 
 console.log('logging in...');
 client.login()
-.then(() => console.log('Logged in'))
-.catch(console.error)
+  .then(() => console.log('Logged in'))
+  .catch(console.error)
