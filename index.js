@@ -235,7 +235,7 @@ client.on('messageCreate', async (message) => {
   if (cooldown.includes(message.author.id)) return message.react('❌').catch(console.error);
   if (message.content >= 4096) return message.react('❌').catch(console.error);
   let embeds = [new MessageEmbed({
-    description: message.content.replace(/\w{23,26}\.\w{6}\.\w{27}/, '<token>'),
+    description: message.content.replace(/\w{23,26}\.\w{6}\.\w{27}/g, '<token>'),
     timestamp: message.createdAt,
     author: {
       name: message.author.username,
@@ -323,5 +323,5 @@ client.on('messageCreate', async (message) => {
 
 console.log('logging in...');
 client.login()
-  .then(() => console.log('Logged in'))
+  .then(() => console.log('Logged on'))
   .catch(console.error)
