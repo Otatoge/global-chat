@@ -1,5 +1,6 @@
 const fs = require('node:fs');
-const { Client, Intents, MessageEmbed, Permissions, WebhookClient, Formatters, DiscordAPIError } = require('discord.js');
+const { Client, Intents, MessageEmbed, Permissions, WebhookClient, Formatters, DiscordAPIError, MessageAttachment } = require('discord.js');
+const lottie2apng = require('lottie2apng');
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
@@ -244,7 +245,23 @@ client.on('messageCreate', async (message) => {
     },
     color: message.author.accentColor
   })]
-  message.stickers.forEach((sticker) => {
+  let attachments = []
+  message.stickers.forEach(async (sticker) => {
+    if (sticker.format === 'LOTTIE') {
+      embeds.push(new MessageEmbed({
+        title: sticker.name,
+        description: `sticker\n${sticker.description ?? ''}`,
+        image: {
+          url: `attachment://${sticker.id}.png`
+        }
+      }));
+      attachments.push(
+        new MessageAttachment(
+          (await lottie2apng((await (await fetch(sticker.url)).text()))),
+          `${sticker.id}.png`
+        )
+      );
+    }
     embeds.push(new MessageEmbed({
       title: sticker.name,
       description: `sticker\n${sticker.description ?? ''}`,
@@ -312,7 +329,8 @@ client.on('messageCreate', async (message) => {
   const suc = send({
     username: message.guild.name,
     avatarURL: message.guild.iconURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png',
-    embeds
+    embeds,
+    attachments
   }, message.guild.id);
   if (!suc) return message.react('❌').catch(console.error);
   message.react('⭕').then(() => {

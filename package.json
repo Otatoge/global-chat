@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "13.x",
-    "lottie2apng": "^2.0.1"
+    "discord.js": "^13.12.0",
+    "lottie2apng": "^2.0.2"
   }
 }
