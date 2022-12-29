@@ -7,7 +7,7 @@ const client = new Client({
 const settings = JSON.parse(fs.readFileSync('./settings.json'));
 client.on('ready', async () => {
   console.log('ready');
-  (await client.guilds.fetch()).forEach(async (guild) => {
+  for (const guild of (await client.guilds.fetch()).values()){
     console.log('fixing settings of ' + guild.name);
     const hook = (await (await client.guilds.fetch(guild.id)).fetchWebhooks()).find((hook) => hook.owner === client.user);
     if (hook) {
@@ -17,6 +17,8 @@ client.on('ready', async () => {
     } else {
       console.log('the guild is not setuped gc');
     }
-  })
+  }
+  console.log('fix is end');
+  client.destroy();
 })
 client.login();

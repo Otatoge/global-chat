@@ -306,11 +306,11 @@ client.on('messageCreate', async (message) => {
     });
     let video
     let image
-    if (message.attachments[0]?.contentType !== undefined) {
-      if (message.attachments[0].contentType.startsWith('image/')) {
-        image = { url: message.attachments[0].url }
-      } else if (message.attachments[0].contentType.startsWith('video/')) {
-        video = { url: message.attachments[0].url }
+    if (message.attachments.at(0)?.contentType !== undefined) {
+      if (message.attachments.at(0).contentType.startsWith('image/')) {
+        image = { url: message.attachments.at(0).url }
+      } else if (message.attachments.at(0).contentType.startsWith('video/')) {
+        video = { url: message.attachments.at(0).url }
       }
     }
     embeds.push(new MessageEmbed({
