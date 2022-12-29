@@ -295,7 +295,7 @@ client.on('messageCreate', async (message) => {
       }
     }));
   });
-  if (message.attachments.size !== 0) {
+  if (message.attachments.size !== 0 || message.embeds.length !== 0) {
     let fields = []
     message.attachments.forEach((attachment) => {
       if (attachment.name >= 255) {
@@ -309,10 +309,15 @@ client.on('messageCreate', async (message) => {
     if (message.attachments.at(0)?.contentType !== undefined) {
       if (message.attachments.at(0).contentType.startsWith('image/')) {
         image = { url: message.attachments.at(0).url }
-      } else if (message.attachments.at(0).contentType.startsWith('video/')) {
+      }
+      if (message.attachments.at(0).contentType.startsWith('video/')) {
         video = { url: message.attachments.at(0).url }
       }
     }
+    message.embeds.forEach((embed) => {
+      if (embed.type === 'image' && !image) image = { url: embed.url }
+      if (embed.type === 'video' && !video) video = { url: embed.url }
+    });
     embeds.push(new MessageEmbed({
       title: 'Attachments',
       fields,
