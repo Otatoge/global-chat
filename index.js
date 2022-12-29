@@ -90,6 +90,16 @@ client.on('ready', () => {
         description: 'server or user id',
         required: true
       }]
+    }, {
+      type: 'SUB_COMMAND',
+      name: 'unblock',
+      description: 'unblock user or server.',
+      options: [{
+        type: 'STRING',
+        name: 'id',
+        description: 'server or user id',
+        required: true
+      }]
     }]
   }]).then(async () => {
     console.log('Ready!');
@@ -192,33 +202,23 @@ client.on('interactionCreate', async (interaction) => {
       const adminRole = await member.guild.roles.fetch('1021568203555622912');
       if (!adminRole.members.every((admin) => member.id !== admin.id)) {
         const id = interaction.options.getString('id')
-        if (block.guilds.includes(id)) {
-          block.guilds = block.guilds.filter((gid) => gid !== id);
+        client.guilds.fetch(id).then(async (guild) => {
+          if (!block.guild.includes(id)) block.guilds.push(id);
+          settings = settings.filter((setting) => setting.guildId !== id);
           set();
-          return interaction.followUp({ embeds: [ok('Successfully unblocked guild')] });
-        } else if (block.users.includes(id)) {
-          block.users = block.users.filter((uid) => uid !== id);
-          set();
-          return interaction.followUp({ embeds: [ok('Successfully unblocked user')] });
-        } else {
-          client.guilds.fetch(id).then(async (guild) => {
-            block.guilds.push(id);
-            settings = settings.filter((setting) => setting.guildId !== id);
+          await guild.leave();
+          return interaction.followUp({ embeds: [ok('Successfully blocked the guild and left the guild')] });
+        }).catch((errd) => {
+          console.error(errd);
+          client.users.fetch(id).then(() => {
+            if (!block.users.includes(id)) block.users.push(id);
             set();
-            await guild.leave();
-            return interaction.followUp({ embeds: [ok('Successfully blocked the guild and left the guild')] });
-          }).catch((errd) => {
-            console.error(errd);
-            client.users.fetch(id).then(() => {
-              block.users.push(id);
-              set();
-              return interaction.followUp({ embeds: [ok('Successfully blocked user')] });
-            }).catch((errdd) => {
-              console.error(errdd);
-              return interaction.followUp({ embeds: [err('Specify guild id or user id')] });
-            });
+            return interaction.followUp({ embeds: [ok('Successfully blocked user')] });
+          }).catch((errdd) => {
+            console.error(errdd);
+            return interaction.followUp({ embeds: [err('Specify guild id or user id')] });
           });
-        }
+        });
       } else {
         return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
       }
@@ -226,7 +226,32 @@ client.on('interactionCreate', async (interaction) => {
       console.error(errd);
       return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
     });
+  } else if (interaction.options.getSubcommand() === 'unblock') {
+    (await client.guilds.fetch('1021237607071485962')).members.fetch(interaction.user.id).then(async (member) => {
+      const adminRole = await member.guild.roles.fetch('1021568203555622912');
+      if (!adminRole.members.every((admin) => member.id !== admin.id)) {
+        const id = interaction.options.getString('id');
+        client.guilds.fetch(id).then(async () => {
+          block.guilds = block.guilds.filter((gid) => gid !== id);
+          set();
+          return interaction.followUp({ embeds: [ok('Successfully unblocked guild')] });
+        }).catch((errd) => {
+          console.error(errd);
+          block.users = block.users.filter((uid) => uid !== id);
+          set();
+          return interaction.followUp({ embeds: [ok('Successfully unblocked user')] });
+        }).catch((errdd) => {
+          console.error(errdd);
+          return interaction.followUp({ embeds: [err('Specify guild id or user id')] });
+        });
+      }
+    });
+  } else {
+    return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
   }
+}).catch((errd) => {
+  console.error(errd);
+  return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
 });
 
 client.on('messageCreate', async (message) => {
