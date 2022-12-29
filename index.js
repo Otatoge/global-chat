@@ -118,7 +118,7 @@ client.on('guildDelete', (guild) => {
 
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return
-  await interaction.deferReply({ ephemeral: true }).catch(console.error);
+  await interaction.deferReply({ ephemeral: false }).catch(console.error);
   if (interaction.options.getSubcommand() === 'connect') {
     if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) return interaction.followUp({ embeds: [err('You do not have MANAGE_GUILD privilege to execute this command')] });
     if (settings.every((setting) => setting.guildId !== interaction.guild.id)) {
@@ -187,8 +187,8 @@ client.on('interactionCreate', async (interaction) => {
     set();
     interaction.followUp({ embeds: [ok('Successfully disconnected from global chat')] });
   } else if (interaction.options.getSubcommand() === 'block') {
-    (await client.guilds.fetch('1022872125700325437')).members.fetch(interaction.user.id).then(async (member) => {
-      const adminRole = await member.guild.roles.fetch('1022874422723498014');
+    (await client.guilds.fetch('1021237607071485962')).members.fetch(interaction.user.id).then(async (member) => {
+      const adminRole = await member.guild.roles.fetch('1021568203555622912');
       if (!adminRole.members.every((admin) => member.id !== admin.id)) {
         const id = interaction.options.getString('id')
         if (block.guilds.includes(id)) {
