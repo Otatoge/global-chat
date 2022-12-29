@@ -244,14 +244,14 @@ client.on('interactionCreate', async (interaction) => {
           console.error(errdd);
           return interaction.followUp({ embeds: [err('Specify guild id or user id')] });
         });
+      } else {
+        return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
       }
+    }).catch((errd) => {
+      console.error(errd);
+      return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
     });
-  } else {
-    return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
   }
-}).catch((errd) => {
-  console.error(errd);
-  return interaction.followUp({ embed: [err('Sorry, only administrators can run this command')] });
 });
 
 client.on('messageCreate', async (message) => {
